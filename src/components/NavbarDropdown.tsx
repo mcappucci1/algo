@@ -1,12 +1,11 @@
 import { memo, MouseEvent } from 'react';
-import { NameValue } from '../utils/types';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 
 interface Props {
     title: string;
     className?: string;
-    objects: NameValue[];
-    active: NameValue;
+    objects: string[];
+    active: string;
     onClick: (event: MouseEvent<HTMLElement>) => void;
 }
 
@@ -16,13 +15,13 @@ export const NavbarDropdown = memo(function NavbarDropdownInternal({ title, clas
             { objects.map((object) => {
                 return (
                     <NavDropdown.Item
-                        key={object.name}
-                        value={object.value}
-                        id={object.name}
-                        active={active.name === object.name}
+                        key={object}
+                        value={object}
+                        id={object}
+                        active={active === object}
                         onClick={onClick}
                     >
-                        {object.name}
+                        {object}
                     </NavDropdown.Item>
                 );
             }) }

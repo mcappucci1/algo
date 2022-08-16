@@ -1,0 +1,5 @@
+.board-container {
+    border: 1px solid red;
+    width: 70%;
+    min-height: 60vh;
+}
