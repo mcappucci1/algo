@@ -1,0 +1,22 @@
+@import "node_modules/bootstrap/scss/bootstrap";
+
+.btn {
+    width: 100px;
+}
+#start-btn {
+    background-color: $green;
+    border-color: $green;
+}
+#start-btn:hover {
+    background-color: white;
+    color: $green;
+    outline: none;
+}
+#end-btn {
+    background-color: $red;
+    border-color: $red;
+}
+#end-btn:hover {
+    background-color: white;
+    color: $red;
+}
