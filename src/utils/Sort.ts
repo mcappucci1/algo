@@ -1,6 +1,12 @@
 import { Algo, SortAlgo, Speed } from './types';
 import { speedToMilliseconds } from './common';
 
+enum SortStage {
+    ACTIVE = 'active-item',
+    SORTED = 'sorted-item',
+    TARGET = 'target-item'
+}
+
 export class Sort {
     algo: Algo;
     speed: Speed;
@@ -37,16 +43,18 @@ export class Sort {
     bubbleSort() {
         let end = this.items.length;
         this.timerId = setInterval(() => {
-            if (this.isSorted()) this.endSortAnimation();
+            if (end === 0) this.endSortAnimation();
             if (this.i === 1) --end;
             const [prevIndex, nextIndex] = [this.i === 0 ? end % this.items.length : this.i-1, (this.i + 1) % (end+1)];
             const [prev, curr, next] = [this.items[prevIndex], this.items[this.i], this.items[nextIndex]];
-            curr.style.backgroundColor = 'black';
-            prev.style.backgroundColor = 'red';
+            if (curr.classList.contains(SortStage.TARGET)) curr.classList.remove(SortStage.TARGET);
+            curr.classList.add(SortStage.ACTIVE);
+            prev.classList.remove(SortStage.ACTIVE);
             if (nextIndex != 0 && this.heightFromPercent(curr.style.height) > this.heightFromPercent(next.style.height)) {
                 const height = curr.style.height;
                 curr.style.height = next.style.height;
                 next.style.height = height;
+                next.classList.add(SortStage.TARGET);
             }
             this.i = nextIndex;
         }, this.milliseconds);
@@ -54,37 +62,34 @@ export class Sort {
 
     insertionSort() {
         let [i, start, min] = [1, 0, this.items[0]];
-        let counter = 0;
+        min.classList.add(SortStage.TARGET);
         this.timerId = setInterval(() => {
-            ++counter;
-            if (this.isSorted()) this.endSortAnimation();
-            const curr = this.items[i];
-            const prev = this.items[i-1 < start ? this.items.length-1 : i-1];
-            curr.style.backgroundColor = 'black';
-            prev.style.backgroundColor = 'red';
-            if (this.heightFromPercent(curr.style.height) < this.heightFromPercent(min.style.height)) min = curr;
+            if (start === this.items.length) this.endSortAnimation();
+            const [curr, prev] = [this.items[i], this.items[i-1 < start ? this.items.length-1 : i-1]];
+            curr.classList.add(SortStage.ACTIVE);
+            prev.classList.remove(SortStage.ACTIVE);
+            if (this.heightFromPercent(curr.style.height) < this.heightFromPercent(min.style.height)) {
+                min.classList.remove(SortStage.TARGET);
+                min = curr;
+                min.classList.add(SortStage.TARGET);
+            }
             i += 1;
             if (i === this.items.length) {
+                min.classList.remove(SortStage.TARGET);
                 const height = this.items[start].style.height;
                 this.items[start].style.height = min.style.height;
                 min.style.height = height;
-                if (parseFloat(min.id) < start) {
-                    console.log('broken');
-                }
                 i = ++start;
                 min = this.items[i];
+                min.classList.add(SortStage.TARGET);
             }
-            --counter;
         }, this.milliseconds);
     }
 
     isSorted() {
         for (let i = 0; i < this.items.length-1; ++i) {
-            const curr = this.items[i].style.height;
-            const next = this.items[i+1].style.height
-            if (this.heightFromPercent(curr) > this.heightFromPercent(next)) {
-                return false;
-            }
+            const [curr, next] = [this.items[i].style.height, this.items[i+1].style.height];
+            if (this.heightFromPercent(curr) > this.heightFromPercent(next)) return false;
         }
         return this.heightFromPercent(this.items[0].style.height) < this.heightFromPercent(this.items[this.items.length-1].style.height);
     }
@@ -92,13 +97,14 @@ export class Sort {
     endSortAnimation() {
         this.clear();
         let i = 0;
-        if (this.items[this.i].style.backgroundColor === 'black') this.items[this.i].style.backgroundColor = 'red';
+        if (this.items[this.i].classList.contains(SortStage.ACTIVE)) this.items[this.i].classList.remove(SortStage.ACTIVE);
         this.timerId = setInterval(() => {
-            if (i === this.items.length) this.clear();
-            else {
-                this.items[i].style.backgroundColor = 'green';
-                ++i;
+            if (i === this.items.length) {
+                this.clear();
+                return;
             }
+            this.items[i].classList.add(SortStage.SORTED);
+            ++i;
         }, 20);
     }
 

@@ -9,3 +9,12 @@
     border-radius: 10px 10px 0 0;
     border: 1px solid black;
 }
+.active-item {
+    background-color: black;
+}
+.sorted-item {
+    background-color: green;
+}
+.target-item {
+    background-color: yellow;
+}
