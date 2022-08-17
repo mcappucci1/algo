@@ -1,7 +1,6 @@
 import '../css/AlgoNavbar.scss';
-import { memo, MouseEvent, useCallback, useMemo } from 'react';
-import { pathfindingAlgos, sortAlgos, speeds } from '../utils/defaultValues';
-import { NameValue } from '../utils/types';
+import { memo, MouseEvent, useCallback } from 'react';
+import { Algo, Speed, SortAlgo, PathfindingAlgo } from '../utils/types';
 import { NavbarDropdown } from './NavbarDropdown';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
@@ -9,25 +8,23 @@ import Navbar from 'react-bootstrap/Navbar';
 import Button from 'react-bootstrap/Button';
 
 interface Props {
-    activeAlgo: NameValue;
-    setAlgo: (algo: NameValue) => void;
-    activeSpeed: NameValue;
-    setSpeed: (speed: NameValue) => void;
+    activeAlgo: Algo;
+    setAlgo: (algo: Algo) => void;
+    activeSpeed: Speed;
+    setSpeed: (speed: Speed) => void;
 }
 
 export const AlgoNavbar = memo(function AlgoNavbarInternal({ activeAlgo, setAlgo, activeSpeed, setSpeed }: Props) {
     const handleAlgoChange = useCallback((event: MouseEvent<HTMLElement>) => {
-        const name = event.currentTarget.getAttribute('id')!;
         const value = event.currentTarget.getAttribute('value')!;
-        if (name === activeAlgo.name) return;
-        setAlgo({ name, value });
+        if (value === activeAlgo) return;
+        setAlgo(value as Algo);
     }, [activeAlgo]);
 
     const handleSpeedChange = useCallback((event: MouseEvent<HTMLElement>) => {
-        const name = event.currentTarget.getAttribute('id')!;
         const value = event.currentTarget.getAttribute('value')!;
-        if (name === activeSpeed.name) return;
-        setSpeed({ name, value });
+        if (value === activeSpeed) return;
+        setSpeed(value as Speed);
     }, [activeSpeed]);
 
     return (
@@ -35,9 +32,9 @@ export const AlgoNavbar = memo(function AlgoNavbarInternal({ activeAlgo, setAlgo
             <Container>
                 <Navbar.Brand href='#home'>Search and Sort</Navbar.Brand>
                 <Nav>
-                    <NavbarDropdown title='Sort' objects={sortAlgos} active={activeAlgo} onClick={handleAlgoChange} />
-                    <NavbarDropdown title='Pathfinding' objects={pathfindingAlgos} active={activeAlgo} onClick={handleAlgoChange} />
-                    <NavbarDropdown title='Speed' objects={speeds} active={activeSpeed} onClick={handleSpeedChange} />
+                    <NavbarDropdown title='Sort' objects={Object.values(SortAlgo)} active={activeAlgo} onClick={handleAlgoChange} />
+                    <NavbarDropdown title='Pathfinding' objects={Object.values(PathfindingAlgo)} active={activeAlgo} onClick={handleAlgoChange} />
+                    <NavbarDropdown title='Speed' objects={Object.values(Speed)} active={activeSpeed} onClick={handleSpeedChange} />
                     <Button className='ms-5' id='start-btn'>Start</Button>
                     <Button className='ms-2' id='end-btn'>End</Button>
                 </Nav>

@@ -1,13 +1,16 @@
-import { memo, useState } from 'react';
+import { Fragment, memo, useState } from 'react';
 import { AlgoNavbar } from './AlgoNavbar';
-import { sortAlgos, speeds } from '../utils/defaultValues';
-import { NameValue } from '../utils/types';
+import { AlgoPage } from './AlgoPage';
+import { Algo, SortAlgo, Speed } from '../utils/types';
 
 export const App = memo(function AppInternal() {
-    const [algo, setAlgo] = useState<NameValue>(sortAlgos[0]);
-    const [speed, setSpeed] = useState<NameValue>(speeds[0]);
+    const [algo, setAlgo] = useState<Algo>(SortAlgo.BUBBLE_SORT);
+    const [speed, setSpeed] = useState<Speed>(Speed.MEDIUM);
 
     return (
-        <AlgoNavbar activeAlgo={algo} setAlgo={setAlgo} activeSpeed={speed} setSpeed={setSpeed} />
+        <Fragment>
+            <AlgoNavbar activeAlgo={algo} setAlgo={setAlgo} activeSpeed={speed} setSpeed={setSpeed} />
+            <AlgoPage algo={algo} speed={speed} />
+        </Fragment>
     );
 });
