@@ -31,7 +31,7 @@ export class Sort {
     }
 
     heightFromPercent(percent: string): number {
-        return parseInt(percent.slice(0, -1));
+        return parseFloat(percent.slice(0, -1));
     }
 
     bubbleSort() {
@@ -54,21 +54,27 @@ export class Sort {
 
     insertionSort() {
         let [i, start, min] = [1, 0, this.items[0]];
+        let counter = 0;
         this.timerId = setInterval(() => {
+            ++counter;
             if (this.isSorted()) this.endSortAnimation();
             const curr = this.items[i];
+            const prev = this.items[i-1 < start ? this.items.length-1 : i-1];
             curr.style.backgroundColor = 'black';
-            this.items[i-1 < start ? this.items.length-1 : i-1].style.backgroundColor = 'red';
+            prev.style.backgroundColor = 'red';
             if (this.heightFromPercent(curr.style.height) < this.heightFromPercent(min.style.height)) min = curr;
             i += 1;
             if (i === this.items.length) {
                 const height = this.items[start].style.height;
                 this.items[start].style.height = min.style.height;
                 min.style.height = height;
-                ++start;
-                i = start;
-                curr.style.backgroundColor = 'black';
+                if (parseFloat(min.id) < start) {
+                    console.log('broken');
+                }
+                i = ++start;
+                min = this.items[i];
             }
+            --counter;
         }, this.milliseconds);
     }
 
