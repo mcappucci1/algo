@@ -22,7 +22,7 @@ export const AlgoPage = memo(function AlgoPageInteral({ algo, speed }: Props) {
         <div className='text-center'>
             <h1 className='mt-5'>{algo}</h1>
             <h5>Speed: <span className={speedColor}>{speed}</span></h5>
-            <div className='board-container mx-auto mt-4'>
+            <div className='board-container mx-auto mt-4 d-flex'>
                 <SortBoard />
             </div>
         </div>
