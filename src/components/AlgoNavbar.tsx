@@ -36,7 +36,7 @@ export const AlgoNavbar = memo(function AlgoNavbarInternal({ activeAlgo, setAlgo
                     <NavbarDropdown title='Pathfinding' objects={Object.values(PathfindingAlgo)} active={activeAlgo} onClick={handleAlgoChange} />
                     <NavbarDropdown title='Speed' objects={Object.values(Speed)} active={activeSpeed} onClick={handleSpeedChange} />
                     <Button className='ms-5' id='start-btn'>Start</Button>
-                    <Button className='ms-2' id='end-btn'>End</Button>
+                    <Button className='ms-2' id='end-btn'>Reset</Button>
                 </Nav>
             </Container>
         </Navbar>

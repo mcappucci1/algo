@@ -12,7 +12,7 @@ export const SortBoard = memo(function SortBoardInternal({ speed, algo }: Props)
     const items = useMemo(() => {
         const lst = [];
         for (let i = 0; i < 50; ++i) {
-            const random = Math.random() * 100;
+            const random = Math.ceil(Math.random() * 100);
             lst.push(<div key={i} id={i.toString()} className='item' style={{ height: random + '%' }} />);
         }
         return lst;

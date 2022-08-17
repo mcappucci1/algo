@@ -10,7 +10,7 @@ export const App = memo(function AppInternal() {
     return (
         <Fragment>
             <AlgoNavbar activeAlgo={algo} setAlgo={setAlgo} activeSpeed={speed} setSpeed={setSpeed} />
-            <AlgoPage algo={algo} speed={speed} />
+            <AlgoPage algo={SortAlgo.INSERTION_SORT} speed={speed} />
         </Fragment>
     );
 });
