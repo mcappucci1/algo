@@ -1,6 +1,7 @@
 .sort-board-container {
     width: 100%;
     border-bottom: 5px solid black;
+    position: relative;
 }
 .item {
     width: 2%;
