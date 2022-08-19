@@ -12,6 +12,15 @@
     color: $green;
     outline: none;
 }
+#pause-btn {
+    background-color: $yellow;
+    border-color: $yellow;
+}
+#pause-btn:hover {
+    background-color: white;
+    color: $yellow;
+    outline: none;
+}
 #end-btn {
     background-color: $red;
     border-color: $red;

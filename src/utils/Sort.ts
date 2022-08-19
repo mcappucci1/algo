@@ -8,45 +8,29 @@ enum SortStage {
 }
 
 export class Sort {
-    algo: Algo;
-    speed: Speed;
-    items: HTMLElement[];
-    milliseconds: number;
+    algo: Algo = SortAlgo.INSERTION_SORT;
+    speed: Speed = Speed.SLOW;
+    items: HTMLElement[] = [];
+    milliseconds: number = speedToMilliseconds(Speed.SLOW);
     timerId: NodeJS.Timer | undefined;
-    i: number = 0;
-
-    constructor(algo: Algo, speed: Speed, items: JSX.Element[]) {
-        this.algo = algo;
-        this.speed = speed;
-        this.items = [];
-        for (let i = 0; i < items.length; ++i) this.items.push(document.getElementById(i.toString())!);
-        this.milliseconds = speedToMilliseconds(speed);
-    }
+    i = 0;
 
     sort() {
         switch(this.algo as SortAlgo) {
-            case SortAlgo.BUBBLE_SORT:
-                this.bubbleSort();
-                break;
-            case SortAlgo.INSERTION_SORT:
-                this.insertionSort();
-                break;
-            default:
-                break;
+            case SortAlgo.BUBBLE_SORT: this.bubbleSort(); break;
+            case SortAlgo.INSERTION_SORT: this.insertionSort(); break;
+            case SortAlgo.MERGE_SORT: this.mergeSort(); break;
+            default: break;
         }
     }
 
-    heightFromPercent(percent: string): number {
-        return parseFloat(percent.slice(0, -1));
-    }
-
     bubbleSort() {
-        let end = this.items.length;
+        let [end, i] = [this.items.length, 0];
         this.timerId = setInterval(() => {
             if (end === 0) this.endSortAnimation();
-            if (this.i === 1) --end;
-            const [prevIndex, nextIndex] = [this.i === 0 ? end % this.items.length : this.i-1, (this.i + 1) % (end+1)];
-            const [prev, curr, next] = [this.items[prevIndex], this.items[this.i], this.items[nextIndex]];
+            if (i === 1) --end;
+            const [prevIndex, nextIndex] = [i === 0 ? end % this.items.length : i-1, (i + 1) % (end+1)];
+            const [prev, curr, next] = [this.items[prevIndex], this.items[i], this.items[nextIndex]];
             if (curr.classList.contains(SortStage.TARGET)) curr.classList.remove(SortStage.TARGET);
             curr.classList.add(SortStage.ACTIVE);
             prev.classList.remove(SortStage.ACTIVE);
@@ -56,7 +40,7 @@ export class Sort {
                 next.style.height = height;
                 next.classList.add(SortStage.TARGET);
             }
-            this.i = nextIndex;
+            i = nextIndex;
         }, this.milliseconds);
     }
 
@@ -86,6 +70,65 @@ export class Sort {
         }, this.milliseconds);
     }
 
+    mergeSort() {
+        this.recMergeSort(this.items);
+    }
+
+    recMergeSort(items: HTMLElement[]): HTMLElement[] {
+        if (items.length === 1) return items;
+        const [l, r] = [
+            this.recMergeSort([...items].splice(0, Math.floor(items.length / 2))).map(e => this.heightFromPercent(e.style.height)),
+            this.recMergeSort([...items].splice(Math.floor(items.length / 2))).map(e => this.heightFromPercent(e.style.height))
+        ];
+        let [i, j] = [0, 0];
+        while (!(i === l.length && j === r.length)) {
+            if ((j === r.length) || (!(i === l.length) && (l[i] < r[j]))) {
+                items[i+j].style.height = l[i] + '%';
+                i += 1;
+            } else {
+                items[i+j].style.height = r[j] + '%';
+                j += 1;
+            }
+        }
+        return items;
+    }
+
+    heightFromPercent(percent: string): number {
+        return parseFloat(percent.slice(0, -1));
+    }
+
+    setAll(algo: Algo, speed: Speed, numItems: number) {
+        this.setSpeed(speed);
+        this.setAlgo(algo);
+        this.setItems(numItems);
+    }
+
+    setSpeed(speed: Speed) {
+        if (speed !== this.speed) {
+            this.milliseconds = speedToMilliseconds(speed);
+            this.speed = speed;
+            if (this.timerId != null) {
+                this.clear();
+                this.resetAppearance();
+            }
+        }
+    }
+
+    setAlgo(algo: Algo) {
+        if (algo !== this.algo) {
+            this.algo = algo;
+            if (this.timerId != null) {
+                this.clear();
+                this.resetAppearance();
+            }
+        }
+    }
+
+    setItems(numItems: number) {
+        this.items = [];
+        for (let i = 0; i < numItems; ++i) this.items.push(document.getElementById(i.toString())!);
+    }
+
     isSorted() {
         for (let i = 0; i < this.items.length-1; ++i) {
             const [curr, next] = [this.items[i].style.height, this.items[i+1].style.height];
@@ -97,15 +140,15 @@ export class Sort {
     endSortAnimation() {
         this.clear();
         let i = 0;
-        if (this.items[this.i].classList.contains(SortStage.ACTIVE)) this.items[this.i].classList.remove(SortStage.ACTIVE);
         this.timerId = setInterval(() => {
-            if (i === this.items.length) {
-                this.clear();
-                return;
-            }
-            this.items[i].classList.add(SortStage.SORTED);
-            ++i;
-        }, 20);
+            if (i === this.items.length) this.clear();
+            else this.items[i++].classList.add(SortStage.SORTED);
+        }, 10);
+    }
+
+    resetAppearance() {
+        for (let i = 0; i < this.items.length; ++i)
+            this.items[i].classList.remove(SortStage.ACTIVE, SortStage.SORTED, SortStage.TARGET);
     }
 
     clear() {
