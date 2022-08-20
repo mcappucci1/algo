@@ -19,7 +19,7 @@ export class Sort {
         switch(this.algo as SortAlgo) {
             case SortAlgo.BUBBLE_SORT: this.bubbleSort(); break;
             case SortAlgo.INSERTION_SORT: this.insertionSort(); break;
-            case SortAlgo.MERGE_SORT: this.asyncMerge([...this.items]); break;
+            case SortAlgo.MERGE_SORT: this.mergeSort(this.items); break;
             default: break;
         }
     }
@@ -74,31 +74,18 @@ export class Sort {
         return new Promise(resolve => setTimeout(resolve, this.milliseconds));
     }
 
-    async asyncMerge(items: HTMLElement[]): Promise<HTMLElement[]> {
+    async mergeSort(items: HTMLElement[]): Promise<HTMLElement[]> {
         if (items.length === 1) return items;
-        const l = await this.asyncMerge([...items].splice(0, Math.floor(items.length / 2))).then(arr => arr.map(e => this.heightFromPercent(e.style.height)));
-        const r = await this.asyncMerge([...items].splice(Math.floor(items.length / 2))).then(arr => arr.map(e => this.heightFromPercent(e.style.height)));
+        const l = await this.mergeSort([...items].splice(0, Math.floor(items.length / 2))).then(arr => arr.map(e => this.heightFromPercent(e.style.height)));
+        const r = await this.mergeSort([...items].splice(Math.floor(items.length / 2))).then(arr => arr.map(e => this.heightFromPercent(e.style.height)));
         let [i, j] = [0, 0];
         while (!(i === l.length && j === r.length)) {
+            items[i+j].classList.add(SortStage.ACTIVE);
             items[i+j].style.height = ((j === r.length) || (!(i === l.length) && (l[i] < r[j]))) ? l[i++] + '%' : r[j++] + '%';
             await this.sleep();
+            items[i+j-1].classList.remove(SortStage.ACTIVE);
         }
-        return items;
-    }
-
-    mergeSort() {
-        this.recMergeSort(this.items);
-    }
-
-    recMergeSort(items: HTMLElement[]): HTMLElement[] {
-        if (items.length === 1) return items;
-        const [l, r] = [
-            this.recMergeSort([...items].splice(0, Math.floor(items.length / 2))).map(e => this.heightFromPercent(e.style.height)),
-            this.recMergeSort([...items].splice(Math.floor(items.length / 2))).map(e => this.heightFromPercent(e.style.height))
-        ];
-        let [i, j] = [0, 0];
-        while (!(i === l.length && j === r.length))
-            items[i+j].style.height = ((j === r.length) || (!(i === l.length) && (l[i] < r[j]))) ? l[i++] + '%' : r[j++] + '%';
+        if (items.length === this.items.length) this.endSortAnimation();
         return items;
     }
 
