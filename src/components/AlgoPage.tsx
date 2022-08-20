@@ -6,9 +6,13 @@ import '../css/AlgoPage.css';
 interface Props {
     algo: Algo;
     speed: Speed;
+    start: boolean;
+    setStart: (start: boolean) => void;
+    reset: boolean;
+    setReset: (reset: boolean) => void;
 }
 
-export const AlgoPage = memo(function AlgoPageInteral({ algo, speed }: Props) {
+export const AlgoPage = memo(function AlgoPageInteral({ algo, speed, start, reset, setStart, setReset }: Props) {
     const speedColor = useMemo(() => {
         switch(speed) {
             case Speed.SLOW: return 'text-success';
@@ -23,7 +27,7 @@ export const AlgoPage = memo(function AlgoPageInteral({ algo, speed }: Props) {
             <h1 className='mt-5'>{algo}</h1>
             <h5>Speed: <span className={speedColor}>{speed}</span></h5>
             <div className='board-container mx-auto mt-4 d-flex'>
-                <SortBoard speed={speed} algo={algo} />
+                <SortBoard speed={speed} algo={algo} start={start} reset={reset} setStart={setStart} setReset={setReset} />
             </div>
         </div>
     );    
