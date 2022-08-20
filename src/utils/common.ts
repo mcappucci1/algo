@@ -1,6 +1,8 @@
-import { Speed } from './types';
+import { Cell, Speed } from './types';
 
 export const NUM_ITEMS = 100;
+export const NUM_COLS = 50;
+export const NUM_ROWS = 30;
 
 export const speedToMilliseconds = (speed: Speed): number => {
     switch(speed) {
@@ -19,3 +21,5 @@ export const shuffleArray = (array: number[]): void => {
         array[j] = temp;
     }
 }
+
+export const getIdFromCoordinate = (coor: Cell) => `${coor.x}-${coor.y}`;

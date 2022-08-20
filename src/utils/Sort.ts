@@ -1,11 +1,5 @@
-import { Algo, SortAlgo, Speed } from './types';
+import { Algo, SortAlgo, SortStage, Speed } from './types';
 import { speedToMilliseconds } from './common';
-
-enum SortStage {
-    ACTIVE = 'active-item',
-    SORTED = 'sorted-item',
-    TARGET = 'target-item'
-}
 
 export class Sort {
     algo: Algo = SortAlgo.INSERTION_SORT;

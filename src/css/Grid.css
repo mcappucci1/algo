@@ -1,0 +1,16 @@
+.cell-row {
+    display: flex;
+}
+.cell {
+    height: 100%;
+    border: 1px solid black;
+}
+.blocked-cell {
+    background-color: red;
+}
+.start-cell {
+    background-color: green;
+}
+.target-cell {
+    background-color: black;
+}

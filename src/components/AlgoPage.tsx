@@ -1,6 +1,7 @@
 import { memo, useMemo } from 'react';
-import { Algo, Speed } from '../utils/types';
+import { Algo, Speed, SortAlgo } from '../utils/types';
 import { SortBoard } from './SortBoard';
+import { PathfindingBoard } from './PathfindingBoard';
 import '../css/AlgoPage.css';
 
 interface Props {
@@ -27,7 +28,9 @@ export const AlgoPage = memo(function AlgoPageInteral({ algo, speed, start, rese
             <h1 className='mt-5'>{algo}</h1>
             <h5>Speed: <span className={speedColor}>{speed}</span></h5>
             <div className='board-container mx-auto mt-4 d-flex'>
-                <SortBoard speed={speed} algo={algo} start={start} reset={reset} setStart={setStart} setReset={setReset} />
+                {Object.values(SortAlgo).includes(algo as SortAlgo) ? 
+                <SortBoard speed={speed} algo={algo} start={start} reset={reset} setStart={setStart} setReset={setReset} /> :
+                <PathfindingBoard />}
             </div>
         </div>
     );    

@@ -16,4 +16,21 @@ export enum PathfindingAlgo {
     DIJKSTRAS = 'Djickstra\'s'
 }
 
+export type Cell = {
+    x: number,
+    y: number
+}
+
 export type Algo = SortAlgo | PathfindingAlgo;
+
+export enum SortStage {
+    ACTIVE = 'active-item',
+    SORTED = 'sorted-item',
+    TARGET = 'target-item'
+}
+
+export enum CellType {
+    BLOCKED = 'blocked-cell',
+    START = 'start-cell',
+    TARGET = 'target-cell'
+}
