@@ -19,7 +19,7 @@ export class Sort {
         switch(this.algo as SortAlgo) {
             case SortAlgo.BUBBLE_SORT: this.bubbleSort(); break;
             case SortAlgo.INSERTION_SORT: this.insertionSort(); break;
-            case SortAlgo.MERGE_SORT: this.mergeSort(); break;
+            case SortAlgo.MERGE_SORT: this.asyncMerge([...this.items]); break;
             default: break;
         }
     }
@@ -70,6 +70,22 @@ export class Sort {
         }, this.milliseconds);
     }
 
+    async sleep() {
+        return new Promise(resolve => setTimeout(resolve, this.milliseconds));
+    }
+
+    async asyncMerge(items: HTMLElement[]): Promise<HTMLElement[]> {
+        if (items.length === 1) return items;
+        const l = await this.asyncMerge([...items].splice(0, Math.floor(items.length / 2))).then(arr => arr.map(e => this.heightFromPercent(e.style.height)));
+        const r = await this.asyncMerge([...items].splice(Math.floor(items.length / 2))).then(arr => arr.map(e => this.heightFromPercent(e.style.height)));
+        let [i, j] = [0, 0];
+        while (!(i === l.length && j === r.length)) {
+            items[i+j].style.height = ((j === r.length) || (!(i === l.length) && (l[i] < r[j]))) ? l[i++] + '%' : r[j++] + '%';
+            await this.sleep();
+        }
+        return items;
+    }
+
     mergeSort() {
         this.recMergeSort(this.items);
     }
@@ -81,15 +97,8 @@ export class Sort {
             this.recMergeSort([...items].splice(Math.floor(items.length / 2))).map(e => this.heightFromPercent(e.style.height))
         ];
         let [i, j] = [0, 0];
-        while (!(i === l.length && j === r.length)) {
-            if ((j === r.length) || (!(i === l.length) && (l[i] < r[j]))) {
-                items[i+j].style.height = l[i] + '%';
-                i += 1;
-            } else {
-                items[i+j].style.height = r[j] + '%';
-                j += 1;
-            }
-        }
+        while (!(i === l.length && j === r.length))
+            items[i+j].style.height = ((j === r.length) || (!(i === l.length) && (l[i] < r[j]))) ? l[i++] + '%' : r[j++] + '%';
         return items;
     }
 
