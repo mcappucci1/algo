@@ -7,7 +7,6 @@ export class Sort {
     items: HTMLElement[] = [];
     milliseconds: number = speedToMilliseconds(Speed.SLOW);
     timerId: NodeJS.Timer | undefined;
-    i = 0;
 
     sort() {
         switch(this.algo as SortAlgo) {

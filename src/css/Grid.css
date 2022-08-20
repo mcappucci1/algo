@@ -14,3 +14,15 @@
 .target-cell {
     background-color: black;
 }
+.search-1-cell {
+    background-color: lightblue;
+}
+.search-2-cell {
+    background-color: blue;
+}
+.search-3-cell {
+    background-color: darkblue;
+}
+.path-cell {
+    background-color: yellow;
+}

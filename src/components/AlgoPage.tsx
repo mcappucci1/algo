@@ -30,7 +30,7 @@ export const AlgoPage = memo(function AlgoPageInteral({ algo, speed, start, rese
             <div className='board-container mx-auto mt-4 d-flex'>
                 {Object.values(SortAlgo).includes(algo as SortAlgo) ? 
                 <SortBoard speed={speed} algo={algo} start={start} reset={reset} setStart={setStart} setReset={setReset} /> :
-                <PathfindingBoard />}
+                <PathfindingBoard speed={speed} algo={algo} start={start} reset={reset} setStart={setStart} setReset={setReset} />}
             </div>
         </div>
     );    

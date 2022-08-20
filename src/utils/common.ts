@@ -22,4 +22,9 @@ export const shuffleArray = (array: number[]): void => {
     }
 }
 
-export const getIdFromCoordinate = (coor: Cell) => `${coor.x}-${coor.y}`;
+export const getIdFromCoordinate = (coor: Cell): string => `${coor.x}-${coor.y}`;
+
+export const getCoordinateFromId = (id: string): Cell => {
+    const nums = id.split('-');
+    return { x: parseInt(nums[0]), y: parseInt(nums[1]) };
+}
