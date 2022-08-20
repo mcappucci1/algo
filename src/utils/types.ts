@@ -8,6 +8,7 @@ export enum Speed {
 export enum SortAlgo {
     BUBBLE_SORT = 'Bubble Sort',
     INSERTION_SORT = 'Insertion Sort',
+    SELECTION_SORT = 'Selection Sort',
     MERGE_SORT = 'Merge Sort'
 }
 
