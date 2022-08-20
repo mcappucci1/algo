@@ -19,18 +19,19 @@ export class Sort {
         switch(this.algo as SortAlgo) {
             case SortAlgo.BUBBLE_SORT: this.bubbleSort(); break;
             case SortAlgo.INSERTION_SORT: this.insertionSort(); break;
+            case SortAlgo.SELECTION_SORT: this.selectionSort(); break;
             case SortAlgo.MERGE_SORT: this.mergeSort(this.items); break;
             default: break;
         }
     }
 
     bubbleSort() {
-        let [end, i] = [this.items.length, 0];
+        let end = this.items.length, i = 0;
         this.timerId = setInterval(() => {
             if (end === 0) this.endSortAnimation();
             if (i === 1) --end;
-            const [prevIndex, nextIndex] = [i === 0 ? end % this.items.length : i-1, (i + 1) % (end+1)];
-            const [prev, curr, next] = [this.items[prevIndex], this.items[i], this.items[nextIndex]];
+            const prevIndex = i === 0 ? end % this.items.length : i-1, nextIndex = (i + 1) % (end+1);
+            const prev = this.items[prevIndex], curr = this.items[i], next = this.items[nextIndex];
             if (curr.classList.contains(SortStage.TARGET)) curr.classList.remove(SortStage.TARGET);
             curr.classList.add(SortStage.ACTIVE);
             prev.classList.remove(SortStage.ACTIVE);
@@ -45,11 +46,28 @@ export class Sort {
     }
 
     insertionSort() {
-        let [i, start, min] = [1, 0, this.items[0]];
+        let i = 1, end = 1, last = 1;
+        this.timerId = setInterval(() => {
+            this.items[last].classList.remove(SortStage.ACTIVE);
+            last = i;
+            if (end === this.items.length) this.endSortAnimation();
+            if (i === 0) i = ++end;
+            const curr = this.items[i], left = this.items[--i];
+            curr.classList.add(SortStage.ACTIVE);
+            if (this.heightFromPercent(curr.style.height) < this.heightFromPercent(left.style.height)) {
+                const store = left.style.height;
+                left.style.height = curr.style.height;
+                curr.style.height = store;
+            } else i = ++end;
+        }, this.milliseconds);
+    }
+
+    selectionSort() {
+        let i = 1, start = 0, min = this.items[0];
         min.classList.add(SortStage.TARGET);
         this.timerId = setInterval(() => {
             if (start === this.items.length) this.endSortAnimation();
-            const [curr, prev] = [this.items[i], this.items[i-1 < start ? this.items.length-1 : i-1]];
+            const curr = this.items[i], prev = this.items[i-1 < start ? this.items.length-1 : i-1];
             curr.classList.add(SortStage.ACTIVE);
             prev.classList.remove(SortStage.ACTIVE);
             if (this.heightFromPercent(curr.style.height) < this.heightFromPercent(min.style.height)) {
@@ -78,7 +96,7 @@ export class Sort {
         if (items.length === 1) return items;
         const l = await this.mergeSort([...items].splice(0, Math.floor(items.length / 2))).then(arr => arr.map(e => this.heightFromPercent(e.style.height)));
         const r = await this.mergeSort([...items].splice(Math.floor(items.length / 2))).then(arr => arr.map(e => this.heightFromPercent(e.style.height)));
-        let [i, j] = [0, 0];
+        let i = 0, j = 0;
         while (!(i === l.length && j === r.length)) {
             items[i+j].classList.add(SortStage.ACTIVE);
             items[i+j].style.height = ((j === r.length) || (!(i === l.length) && (l[i] < r[j]))) ? l[i++] + '%' : r[j++] + '%';
@@ -127,7 +145,7 @@ export class Sort {
 
     isSorted() {
         for (let i = 0; i < this.items.length-1; ++i) {
-            const [curr, next] = [this.items[i].style.height, this.items[i+1].style.height];
+            const curr = this.items[i].style.height, next = this.items[i+1].style.height;
             if (this.heightFromPercent(curr) > this.heightFromPercent(next)) return false;
         }
         return this.heightFromPercent(this.items[0].style.height) < this.heightFromPercent(this.items[this.items.length-1].style.height);
