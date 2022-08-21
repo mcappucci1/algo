@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect } from 'react';
+import { memo, useRef, useEffect } from 'react';
 import { Grid } from './Grid';
 import { Speed, Algo } from '../utils/types';
 import { Pathfinding } from '../utils/Pathfinding';
@@ -24,11 +24,9 @@ export const PathfindingBoard = memo(function PathfindingBoardInternal({
     reset,
     setReset
 }: Props) {
-
     useEffect(() => {
         if (algo !== PATHFINDING.algo) {
             PATHFINDING.setAlgo(algo);
-            PATHFINDING.resetBoard();
             setStart(false);
         }
     }, [algo]);
@@ -36,7 +34,6 @@ export const PathfindingBoard = memo(function PathfindingBoardInternal({
     useEffect(() => {
         if (speed !== PATHFINDING.speed) {
             PATHFINDING.setSpeed(speed);
-            PATHFINDING.resetBoard();
             setStart(false);
         }
     }, [speed]);
@@ -56,7 +53,7 @@ export const PathfindingBoard = memo(function PathfindingBoardInternal({
 
     return (
         <div className='w-100'>
-            <Grid />
+            <Grid reset={reset} />
         </div>
     );
 });

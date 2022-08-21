@@ -1,10 +1,14 @@
 
-import { Fragment, memo, MouseEvent, useCallback, useMemo, useState } from "react";
+import { Fragment, memo, MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { getIdFromCoordinate, NUM_COLS, NUM_ROWS } from "../utils/common";
 import { CellType } from '../utils/types';
 import '../css/Grid.css';
 
-export const Grid = memo(function GridInternal() {
+interface Props {
+    reset: boolean;
+}
+
+export const Grid = memo(function GridInternal({ reset }: Props) {
     const [start, setStart] = useState<boolean>(false);
     const [target, setTarget] = useState<boolean>(false);
 
@@ -39,6 +43,11 @@ export const Grid = memo(function GridInternal() {
             }
         }
     }, [start, target]);
+
+    useEffect(() => {
+        setStart(false);
+        setTarget(false);
+    }, [reset]);
 
     const board: JSX.Element[] = useMemo(() => {
         const boardCells: JSX.Element[][] = [];
