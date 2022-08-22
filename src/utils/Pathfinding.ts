@@ -1,5 +1,5 @@
 import { Algo, CellType, PathfindingAlgo, Speed } from './types';
-import { getCoordinateFromId, getIdFromCoordinate, speedToMilliseconds, NUM_COLS, NUM_ROWS } from './common';
+import { getCoordinateFromId, getIdFromCoordinate, speedToMilliseconds, NUM_COLS, NUM_ROWS, PriorityQueue } from './common';
 
 const MOVES = [[1,0], [0,1], [-1,0], [0,-1]];
 
@@ -7,15 +7,21 @@ export class Pathfinding {
     algo: Algo = PathfindingAlgo.DIJKSTRAS;
     speed: Speed = Speed.SLOW;
     start: string = '';
+    stop = false;
+    running = false;
+    end: string = '';
     items: HTMLElement[][] = [[]];
     milliseconds: number = speedToMilliseconds(Speed.SLOW);
     timerId: NodeJS.Timer | undefined;
 
     findPath() {
+        this.running = true;
         for(let i = 0; i < NUM_ROWS; ++i) {
             for (let j = 0; j < NUM_COLS; ++j) {
                 if (this.items[i][j].classList.contains(CellType.START)) {
                     this.start = getIdFromCoordinate({ x: i, y: j});
+                } else if (this.items[i][j].classList.contains(CellType.TARGET)) {
+                    this.end = getIdFromCoordinate({ x: i, y: j});
                 }
             }
         }
@@ -26,8 +32,33 @@ export class Pathfinding {
         }
     }
 
-    async sleep() {
-        return new Promise(resolve => setTimeout(resolve, this.milliseconds));
+    async dijkstras() {
+        const seen = new Map<string, string>(), q = new PriorityQueue([[this.start, 0]]), endCoor = getCoordinateFromId(this.end);
+        seen.set(this.start, '');
+        while (q.length !== 0) {
+            if (this.stop) {
+                this.stop = false;
+                this.resetBoard();
+                return;
+            }
+            await this.sleep();
+            const curr = q.pop()!;
+            const coor = getCoordinateFromId(curr);
+            for (let i = 0; i < MOVES.length; ++i) {
+                const move = MOVES[i], next = { x: coor.x + move[0], y: coor.y + move[1] }, nextId = getIdFromCoordinate(next);
+                if (next.x >= 0 && next.x < this.items.length && next.y >= 0 && next.y < this.items[0].length && !seen.has(nextId)) {
+                    if (this.items[next.x][next.y].classList.contains(CellType.BLOCKED)) seen.set(nextId, '');
+                    else if (this.items[next.x][next.y].classList.contains(CellType.TARGET)) {
+                        break;
+                    } else {
+                        seen.set(nextId, curr);
+                        const score = Math.sqrt(Math.pow(endCoor.x - next.x, 2) + Math.pow(endCoor.y - next.y, 2));
+                        q.push([nextId, score]);
+                    }
+                }
+            }
+        }
+        this.running = false;
     }
 
     async firstSearch(get: (arr: string[]) => string) {
@@ -35,6 +66,11 @@ export class Pathfinding {
         let done = false;
         seen.set(this.start, '');
         while (q.length !== 0 && !done) {
+            if (this.stop) {
+                this.stop = false;
+                this.resetBoard();
+                return;
+            }
             await this.sleep();
             const coorStr = get(q), coor = getCoordinateFromId(coorStr);
             if (coorStr !== this.start) this.items[coor.x][coor.y].classList.add(CellType.SEARCH_1);
@@ -62,10 +98,16 @@ export class Pathfinding {
 
     async breadthFirstSearch() {
         await this.firstSearch((arr: string[]) => arr.shift()!);
+        this.running = false;
     }
 
     async depthFirstSearch() {
         await this.firstSearch((arr: string[]) => arr.pop()!);
+        this.running = false;
+    }
+
+    async sleep() {
+        return new Promise(resolve => setTimeout(resolve, this.milliseconds));
     }
 
     drawPath(path: string[]) {
@@ -114,5 +156,10 @@ export class Pathfinding {
                 classes.forEach(c => { if (cell.contains(c)) cell.remove(c); });
             }
         }
+    }
+
+    stopExecution() {
+        if (this.running) this.stop = true;
+        else this.resetBoard();
     }
 }
