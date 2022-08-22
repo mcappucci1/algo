@@ -13,7 +13,7 @@ export enum SortAlgo {
 }
 
 export enum PathfindingAlgo {
-    DIJKSTRAS = 'Djickstra\'s',
+    A_STAR = 'A*',
     BREADTH_FIRST_SEARCH = 'Breadth First Search',
     DEPTH_FIRST_SEARCH = 'Depth First Search'
 }

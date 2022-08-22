@@ -4,7 +4,7 @@ import { getCoordinateFromId, getIdFromCoordinate, speedToMilliseconds, NUM_COLS
 const MOVES = [[1,0], [0,1], [-1,0], [0,-1]];
 
 export class Pathfinding {
-    algo: Algo = PathfindingAlgo.DIJKSTRAS;
+    algo: Algo = PathfindingAlgo.A_STAR;
     speed: Speed = Speed.SLOW;
     start: string = '';
     stop = false;
@@ -26,16 +26,18 @@ export class Pathfinding {
             }
         }
         switch(this.algo as PathfindingAlgo) {
+            case PathfindingAlgo.A_STAR: this.a_start(); break;
             case PathfindingAlgo.BREADTH_FIRST_SEARCH: this.breadthFirstSearch(); break;
             case PathfindingAlgo.DEPTH_FIRST_SEARCH: this.depthFirstSearch(); break;
             default: break;
         }
     }
 
-    async dijkstras() {
-        const seen = new Map<string, string>(), q = new PriorityQueue([[this.start, 0]]), endCoor = getCoordinateFromId(this.end);
+    async a_start() {
+        const seen = new Map<string, string>(), q = new PriorityQueue([[this.start, 0, 0]]), startCoor = getCoordinateFromId(this.start), endCoor = getCoordinateFromId(this.end);
+        let done = false;
         seen.set(this.start, '');
-        while (q.length !== 0) {
+        while (q.length !== 0 && !done) {
             if (this.stop) {
                 this.stop = false;
                 this.resetBoard();
@@ -43,17 +45,26 @@ export class Pathfinding {
             }
             await this.sleep();
             const curr = q.pop()!;
-            const coor = getCoordinateFromId(curr);
+            const coor = getCoordinateFromId(curr[0]);
+            if (curr[0] !== this.start) this.items[coor.x][coor.y].classList.add(CellType.SEARCH_1);
             for (let i = 0; i < MOVES.length; ++i) {
                 const move = MOVES[i], next = { x: coor.x + move[0], y: coor.y + move[1] }, nextId = getIdFromCoordinate(next);
                 if (next.x >= 0 && next.x < this.items.length && next.y >= 0 && next.y < this.items[0].length && !seen.has(nextId)) {
                     if (this.items[next.x][next.y].classList.contains(CellType.BLOCKED)) seen.set(nextId, '');
                     else if (this.items[next.x][next.y].classList.contains(CellType.TARGET)) {
+                        let path = [], coorStr = curr[0];
+                        while (coorStr !== this.start) {
+                            path.push(coorStr);
+                            coorStr = seen.get(coorStr)!;
+                        }
+                        this.drawPath(path);
+                        done = true;
                         break;
                     } else {
-                        seen.set(nextId, curr);
-                        const score = Math.sqrt(Math.pow(endCoor.x - next.x, 2) + Math.pow(endCoor.y - next.y, 2));
-                        q.push([nextId, score]);
+                        seen.set(nextId, curr[0]);
+                        const distanceToTarget = Math.sqrt(Math.pow(endCoor.x - next.x, 2) + Math.pow(endCoor.y - next.y, 2));
+                        const distanceFromStart = curr[1] + 1;
+                        q.push([nextId, distanceFromStart, distanceToTarget]);
                     }
                 }
             }

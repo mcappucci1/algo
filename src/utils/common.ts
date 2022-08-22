@@ -30,18 +30,19 @@ export const getCoordinateFromId = (id: string): Cell => {
 }
 
 export class PriorityQueue {
-    arr: [string, number][] = [];
+    arr: [string, number, number][] = [];
     length: number = 0;
 
-    constructor(start: [string, number][]) {
+    constructor(start: [string, number, number][]) {
         start.forEach((e) => this.push(e));
     }
 
-    push(e: [string, number]): void {
-        let l = 0, r = this.arr.length, m = -1;
+    push(e: [string, number, number]): void {
+        if (this.length === 0) this.arr.push(e);
+        let l = 0, r = this.arr.length - 1, m = -1;
         while (l <= r) {
             m = Math.floor((l + r) / 2);
-            if (e[1] < this.arr[m][1]) r = m-1;
+            if ((e[1] + e[2]) < (this.arr[m][1] + this.arr[m][2])) r = m-1;
             else if (e[1] > this.arr[m][1]) l = m+1;
             else break;
         }
@@ -49,9 +50,9 @@ export class PriorityQueue {
         this.length = this.arr.length;
     }
 
-    pop(): string | undefined {
+    pop(): [string, number, number] | undefined {
         const val = this.arr.shift();
         this.length = this.arr.length;
-        return val && val[0];
+        return val;
     }
 }
