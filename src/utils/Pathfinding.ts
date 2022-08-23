@@ -13,6 +13,7 @@ export class Pathfinding {
     items: HTMLElement[][] = [[]];
     milliseconds: number = speedToMilliseconds(Speed.SLOW);
     timerId: NodeJS.Timer | undefined;
+    alpha = 1;
 
     findPath() {
         this.running = true;
@@ -26,14 +27,14 @@ export class Pathfinding {
             }
         }
         switch(this.algo as PathfindingAlgo) {
-            case PathfindingAlgo.A_STAR: this.a_start(); break;
+            case PathfindingAlgo.A_STAR: this.a_star(); break;
             case PathfindingAlgo.BREADTH_FIRST_SEARCH: this.breadthFirstSearch(); break;
             case PathfindingAlgo.DEPTH_FIRST_SEARCH: this.depthFirstSearch(); break;
             default: break;
         }
     }
 
-    async a_start() {
+    async a_star() {
         const seen = new Map<string, string>(), q = new PriorityQueue([[this.start, 0, 0]]), startCoor = getCoordinateFromId(this.start), endCoor = getCoordinateFromId(this.end);
         let done = false;
         seen.set(this.start, '');
@@ -62,7 +63,7 @@ export class Pathfinding {
                         break;
                     } else {
                         seen.set(nextId, curr[0]);
-                        const distanceToTarget = Math.sqrt(Math.pow(endCoor.x - next.x, 2) + Math.pow(endCoor.y - next.y, 2));
+                        const distanceToTarget = this.alpha * Math.sqrt(Math.pow(endCoor.x - next.x, 2) + Math.pow(endCoor.y - next.y, 2));
                         const distanceFromStart = curr[1] + 1;
                         q.push([nextId, distanceFromStart, distanceToTarget]);
                     }
