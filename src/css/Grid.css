@@ -1,0 +1,28 @@
+.cell-row {
+    display: flex;
+}
+.cell {
+    height: 100%;
+    border: 1px solid black;
+}
+.blocked-cell {
+    background-color: red;
+}
+.start-cell {
+    background-color: green;
+}
+.target-cell {
+    background-color: black;
+}
+.search-1-cell {
+    background-color: lightblue;
+}
+.search-2-cell {
+    background-color: blue;
+}
+.search-3-cell {
+    background-color: darkblue;
+}
+.path-cell {
+    background-color: yellow;
+}

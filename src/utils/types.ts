@@ -13,7 +13,30 @@ export enum SortAlgo {
 }
 
 export enum PathfindingAlgo {
-    DIJKSTRAS = 'Djickstra\'s'
+    A_STAR = 'A*',
+    BREADTH_FIRST_SEARCH = 'Breadth First Search',
+    DEPTH_FIRST_SEARCH = 'Depth First Search'
+}
+
+export type Cell = {
+    x: number,
+    y: number
 }
 
 export type Algo = SortAlgo | PathfindingAlgo;
+
+export enum SortStage {
+    ACTIVE = 'active-item',
+    SORTED = 'sorted-item',
+    TARGET = 'target-item'
+}
+
+export enum CellType {
+    BLOCKED = 'blocked-cell',
+    START = 'start-cell',
+    TARGET = 'target-cell',
+    SEARCH_1 = 'search-1-cell',
+    SEARCH_2 = 'search-2-cell',
+    SEARCH_3 = 'search-3-cell',
+    PATH = 'path-cell'
+}
