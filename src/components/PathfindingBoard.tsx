@@ -28,6 +28,8 @@ export const PathfindingBoard = memo(function PathfindingBoardInternal({
     setShowSetStartToast,
     setShowSetTargetToast
 }: Props) {
+    console.log(PATHFINDING.alpha);
+
     useEffect(() => {
         if (algo !== PATHFINDING.algo) {
             if (PATHFINDING.running) {
@@ -63,13 +65,13 @@ export const PathfindingBoard = memo(function PathfindingBoardInternal({
     }, []);
 
     const handleAlphaChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        PATHFINDING.alpha = parseInt(event.currentTarget.value);
+        PATHFINDING.alpha = parseFloat(event.currentTarget.value);
     }, []);
 
     return (
         <div className='w-100'>
             <Grid reset={reset} />
-            {PATHFINDING.algo === PathfindingAlgo.A_STAR &&
+            {algo === PathfindingAlgo.A_STAR &&
             <div id='alpha-container' className='w-100 mt-3'>
                 <label className='me-3'>Alpha Value</label>
                 <input type='number' id='alpha' name='alpha' onChange={handleAlphaChange} />

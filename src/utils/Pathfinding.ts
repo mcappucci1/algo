@@ -64,7 +64,7 @@ export class Pathfinding {
                             path.push(coorStr);
                             coorStr = seen.get(coorStr)!;
                         }
-                        this.drawPath(path);
+                        await this.drawPath(path);
                         done = true;
                         break;
                     } else {
@@ -98,14 +98,14 @@ export class Pathfinding {
                 const [startPath, endPath]: [string[], string[]] = [[], []];
                 let [start, end] = seenEnd.has(currStart) ? [currStart, seenEnd.get(currStart)!] : [seenStart.get(currEnd)!, currEnd];
                 while (start !== this.start) {
-                    startPath.push(start);
+                    startPath.unshift(start);
                     start = seenStart.get(start)!;
                 }
                 while (end !== this.end) {
                     endPath.push(end);
                     end = seenEnd.get(end)!;
                 }
-                this.drawPath(startPath.concat(endPath));
+                await this.drawPath(startPath.concat(endPath));
                 done = true;
                 break;
             }
@@ -158,7 +158,7 @@ export class Pathfinding {
                             path.push(curr);
                             curr = seen.get(curr)!;
                         }
-                        this.drawPath(path);
+                        await this.drawPath(path);
                         done = true;
                         break;
                     } else {
@@ -180,12 +180,14 @@ export class Pathfinding {
         this.running = false;
     }
 
-    async sleep() {
-        return new Promise(resolve => setTimeout(resolve, this.milliseconds));
+    async sleep(time?: number) {
+        return new Promise(resolve => setTimeout(resolve, time || this.milliseconds));
     }
 
-    drawPath(path: string[]) {
+    async drawPath(path: string[]) {
         for (let i = path.length - 1; i >= 0; --i) {
+            if (this.stop) break;
+            await this.sleep(50);
             const coor = getCoordinateFromId(path[i]);
             this.items[coor.x][coor.y].classList.add(CellType.PATH);
         }
