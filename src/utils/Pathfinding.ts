@@ -48,7 +48,7 @@ export class Pathfinding {
             if (this.stop) {
                 this.stop = false;
                 this.resetBoard();
-                return;
+                break;
             }
             await this.sleep();
             const curr = q.pop()!;
@@ -141,9 +141,10 @@ export class Pathfinding {
         seen.set(this.start!, '');
         while (q.length !== 0 && !done) {
             if (this.stop) {
+                console.log('yeet');
                 this.stop = false;
                 this.resetBoard();
-                return;
+                break;
             }
             await this.sleep();
             const coorStr = get(q), coor = getCoordinateFromId(coorStr);
@@ -168,16 +169,15 @@ export class Pathfinding {
                 }
             }
         }
+        this.running = false;
     }
 
     async breadthFirstSearch() {
         await this.firstSearch((arr: string[]) => arr.shift()!);
-        this.running = false;
     }
 
     async depthFirstSearch() {
         await this.firstSearch((arr: string[]) => arr.pop()!);
-        this.running = false;
     }
 
     async sleep(time?: number) {
