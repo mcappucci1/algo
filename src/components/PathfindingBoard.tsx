@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { Grid } from './Grid';
 import { Speed, Algo, PathfindingAlgo } from '../utils/types';
 import { Pathfinding } from '../utils/Pathfinding';
@@ -28,7 +28,7 @@ export const PathfindingBoard = memo(function PathfindingBoardInternal({
     setShowSetStartToast,
     setShowSetTargetToast
 }: Props) {
-    console.log(PATHFINDING.alpha);
+    const [alpha, setAlpha] = useState<number>(0.5);
 
     useEffect(() => {
         if (algo !== PATHFINDING.algo) {
@@ -52,7 +52,10 @@ export const PathfindingBoard = memo(function PathfindingBoardInternal({
             PATHFINDING.getStartandEnd();
             if (PATHFINDING.start == undefined) setShowSetStartToast(true);
             else if (PATHFINDING.end == undefined) setShowSetTargetToast(true);
-            else if (!PATHFINDING.running) PATHFINDING.findPath();
+            else if (!PATHFINDING.running) {
+                PATHFINDING.alpha = alpha;
+                PATHFINDING.findPath();
+            }
             setStart(false);
         } else if (reset) {
             PATHFINDING.stopExecution();
@@ -65,8 +68,8 @@ export const PathfindingBoard = memo(function PathfindingBoardInternal({
     }, []);
 
     const handleAlphaChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        PATHFINDING.alpha = parseFloat(event.currentTarget.value);
-    }, []);
+        setAlpha(parseFloat(event.currentTarget.value));
+    }, [setAlpha]);
 
     return (
         <div className='w-100'>
@@ -74,7 +77,7 @@ export const PathfindingBoard = memo(function PathfindingBoardInternal({
             {algo === PathfindingAlgo.A_STAR &&
             <div id='alpha-container' className='w-100 mt-3'>
                 <label className='me-3'>Alpha Value</label>
-                <input type='number' id='alpha' name='alpha' onChange={handleAlphaChange} />
+                <input type='number' id='alpha' name='alpha' onChange={handleAlphaChange} value={alpha} />
             </div>
             }
         </div>

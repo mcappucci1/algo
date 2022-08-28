@@ -186,7 +186,10 @@ export class Pathfinding {
 
     async drawPath(path: string[]) {
         for (let i = path.length - 1; i >= 0; --i) {
-            if (this.stop) break;
+            if (this.stop) {
+                this.resetBoard();
+                break;
+            }
             await this.sleep(50);
             const coor = getCoordinateFromId(path[i]);
             this.items[coor.x][coor.y].classList.add(CellType.PATH);
