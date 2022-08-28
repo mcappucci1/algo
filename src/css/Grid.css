@@ -18,10 +18,7 @@
     background-color: lightblue;
 }
 .search-2-cell {
-    background-color: blue;
-}
-.search-3-cell {
-    background-color: darkblue;
+    background-color: rgb(0,0,255,0.3);
 }
 .path-cell {
     background-color: yellow;

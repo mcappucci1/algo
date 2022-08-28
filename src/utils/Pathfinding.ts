@@ -6,17 +6,18 @@ const MOVES = [[1,0], [0,1], [-1,0], [0,-1]];
 export class Pathfinding {
     algo: Algo = PathfindingAlgo.A_STAR;
     speed: Speed = Speed.SLOW;
-    start: string = '';
+    start: string | undefined;
     stop = false;
     running = false;
-    end: string = '';
+    end: string | undefined;
     items: HTMLElement[][] = [[]];
     milliseconds: number = speedToMilliseconds(Speed.SLOW);
     timerId: NodeJS.Timer | undefined;
     alpha = 1;
 
-    findPath() {
-        this.running = true;
+    getStartandEnd() {
+        this.start = undefined;
+        this.end = undefined;
         for(let i = 0; i < NUM_ROWS; ++i) {
             for (let j = 0; j < NUM_COLS; ++j) {
                 if (this.items[i][j].classList.contains(CellType.START)) {
@@ -26,6 +27,10 @@ export class Pathfinding {
                 }
             }
         }
+    }
+
+    findPath() {
+        this.running = true;
         switch(this.algo as PathfindingAlgo) {
             case PathfindingAlgo.A_STAR: this.a_star(); break;
             case PathfindingAlgo.BREADTH_FIRST_SEARCH: this.breadthFirstSearch(); break;
@@ -36,9 +41,9 @@ export class Pathfinding {
     }
 
     async a_star() {
-        const seen = new Map<string, string>(), q = new PriorityQueue([[this.start, 0, 0]]), startCoor = getCoordinateFromId(this.start), endCoor = getCoordinateFromId(this.end);
+        const seen = new Map<string, string>(), q = new PriorityQueue([[this.start!, 0, 0]]), endCoor = getCoordinateFromId(this.end!);
         let done = false;
-        seen.set(this.start, '');
+        seen.set(this.start!, '');
         while (q.length !== 0 && !done) {
             if (this.stop) {
                 this.stop = false;
@@ -75,8 +80,8 @@ export class Pathfinding {
     }
 
     async bidirectionalSearch() {
-        const [seenStart, qStart] = [new Map<string, string>([[this.start, '']]), [this.start]];
-        const [seenEnd, qEnd] = [new Map<string, string>([[this.end, '']]), [this.end]];
+        const [seenStart, qStart] = [new Map<string, string>([[this.start!, '']]), [this.start!]];
+        const [seenEnd, qEnd] = [new Map<string, string>([[this.end!, '']]), [this.end!]];
         let done = false;
         while ((qStart.length !== 0 || qEnd.length !== 0) && !done) {
             if (this.stop) {
@@ -131,9 +136,9 @@ export class Pathfinding {
     }
 
     async firstSearch(get: (arr: string[]) => string) {
-        const seen = new Map<string, string>(), q = [this.start];
+        const seen = new Map<string, string>(), q = [this.start!];
         let done = false;
-        seen.set(this.start, '');
+        seen.set(this.start!, '');
         while (q.length !== 0 && !done) {
             if (this.stop) {
                 this.stop = false;

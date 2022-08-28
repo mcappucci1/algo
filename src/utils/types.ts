@@ -38,6 +38,5 @@ export enum CellType {
     TARGET = 'target-cell',
     SEARCH_1 = 'search-1-cell',
     SEARCH_2 = 'search-2-cell',
-    SEARCH_3 = 'search-3-cell',
     PATH = 'path-cell'
 }
