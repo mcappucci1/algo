@@ -9,6 +9,7 @@ export class Pathfinding {
     start: string | undefined;
     stop = false;
     running = false;
+    run = false;
     end: string | undefined;
     items: HTMLElement[][] = [[]];
     milliseconds: number = speedToMilliseconds(Speed.SLOW);
@@ -30,6 +31,7 @@ export class Pathfinding {
     }
 
     findPath() {
+        this.run = true;
         this.running = true;
         switch(this.algo as PathfindingAlgo) {
             case PathfindingAlgo.A_STAR: this.a_star(); break;
@@ -234,6 +236,7 @@ export class Pathfinding {
                 classes.forEach(c => { if (cell.contains(c)) cell.remove(c); });
             }
         }
+        this.run = false;
     }
 
     stopExecution() {
