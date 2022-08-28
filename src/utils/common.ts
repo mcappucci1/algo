@@ -26,6 +26,7 @@ export const getIdFromCoordinate = (coor: Cell): string => `${coor.x}-${coor.y}`
 
 export const getCoordinateFromId = (id: string): Cell => {
     const nums = id.split('-');
+    console.log(nums);
     return { x: parseInt(nums[0]), y: parseInt(nums[1]) };
 }
 

@@ -13,9 +13,10 @@ export enum SortAlgo {
 }
 
 export enum PathfindingAlgo {
-    A_STAR = 'A*',
+    A_STAR = 'A* Search',
     BREADTH_FIRST_SEARCH = 'Breadth First Search',
-    DEPTH_FIRST_SEARCH = 'Depth First Search'
+    DEPTH_FIRST_SEARCH = 'Depth First Search',
+    BIDIRECTIONAL_SEARCH = 'Bidirectional Search',
 }
 
 export type Cell = {

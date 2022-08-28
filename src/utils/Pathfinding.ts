@@ -30,6 +30,7 @@ export class Pathfinding {
             case PathfindingAlgo.A_STAR: this.a_star(); break;
             case PathfindingAlgo.BREADTH_FIRST_SEARCH: this.breadthFirstSearch(); break;
             case PathfindingAlgo.DEPTH_FIRST_SEARCH: this.depthFirstSearch(); break;
+            case PathfindingAlgo.BIDIRECTIONAL_SEARCH: this.bidirectionalSearch(); break;
             default: break;
         }
     }
@@ -66,6 +67,62 @@ export class Pathfinding {
                         const distanceToTarget = this.alpha * Math.sqrt(Math.pow(endCoor.x - next.x, 2) + Math.pow(endCoor.y - next.y, 2));
                         const distanceFromStart = curr[1] + 1;
                         q.push([nextId, distanceFromStart, distanceToTarget]);
+                    }
+                }
+            }
+        }
+        this.running = false;
+    }
+
+    async bidirectionalSearch() {
+        const [seenStart, qStart] = [new Map<string, string>([[this.start, '']]), [this.start]];
+        const [seenEnd, qEnd] = [new Map<string, string>([[this.end, '']]), [this.end]];
+        let done = false;
+        while ((qStart.length !== 0 || qEnd.length !== 0) && !done) {
+            if (this.stop) {
+                this.stop = false;
+                this.resetBoard();
+                return;
+            }
+            await this.sleep();
+            const [currStart, currEnd] = [qStart.shift()!, qEnd.shift()!];
+            const [coorStart, coorEnd] = [getCoordinateFromId(currStart), getCoordinateFromId(currEnd)];
+            if (currStart !== this.start) this.items[coorStart.x][coorStart.y].classList.add(CellType.SEARCH_1);
+            if (currEnd !== this.end) this.items[coorEnd.x][coorEnd.y].classList.add(CellType.SEARCH_2);
+            if (seenEnd.has(currStart) || seenStart.has(currEnd)) {
+                const [startPath, endPath]: [string[], string[]] = [[], []];
+                let [start, end] = seenEnd.has(currStart) ? [currStart, seenEnd.get(currStart)!] : [seenStart.get(currEnd)!, currEnd];
+                while (start !== this.start) {
+                    startPath.push(start);
+                    start = seenStart.get(start)!;
+                }
+                while (end !== this.end) {
+                    endPath.push(end);
+                    end = seenEnd.get(end)!;
+                }
+                this.drawPath(startPath.concat(endPath));
+                done = true;
+                break;
+            }
+            for (let i = 0; i < MOVES.length; ++i) {
+                const move = MOVES[i];
+                const [nextStart, nextEnd] = [
+                    {x: coorStart.x + move[0], y: coorStart.y + move[1]},
+                    {x: coorEnd.x + move[0], y: coorEnd.y + move[1]}
+                ];
+                const [nextStartId, nextEndId] = [getIdFromCoordinate(nextStart), getIdFromCoordinate(nextEnd)];
+                if (nextStart.x >= 0 && nextStart.x < NUM_ROWS && nextStart.y >= 0 && nextStart.y < NUM_COLS && !seenStart.has(nextStartId)) {
+                    if (this.items[nextStart.x][nextStart.y].classList.contains(CellType.BLOCKED)) seenStart.set(nextStartId, '');
+                    else {
+                        seenStart.set(nextStartId, currStart);
+                        qStart.push(nextStartId);
+                    }
+                }
+                if (nextEnd.x >= 0 && nextEnd.x < NUM_ROWS && nextEnd.y >= 0 && nextEnd.y < NUM_COLS && !seenEnd.has(nextEndId)) {
+                    if (this.items[nextEnd.x][nextEnd.y].classList.contains(CellType.BLOCKED)) seenEnd.set(nextEndId, '');
+                    else {
+                        seenEnd.set(nextEndId, currEnd);
+                        qEnd.push(nextEndId);
                     }
                 }
             }
