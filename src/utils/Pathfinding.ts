@@ -85,9 +85,9 @@ export class Pathfinding {
         let done = false;
         while ((qStart.length !== 0 || qEnd.length !== 0) && !done) {
             if (this.stop) {
-                this.stop = false;
                 this.resetBoard();
-                return;
+                this.stop = false;
+                break;
             }
             await this.sleep();
             const [currStart, currEnd] = [qStart.shift()!, qEnd.shift()!];
