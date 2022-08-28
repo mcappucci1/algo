@@ -98,14 +98,14 @@ export class Pathfinding {
                 const [startPath, endPath]: [string[], string[]] = [[], []];
                 let [start, end] = seenEnd.has(currStart) ? [currStart, seenEnd.get(currStart)!] : [seenStart.get(currEnd)!, currEnd];
                 while (start !== this.start) {
-                    startPath.unshift(start);
+                    startPath.push(start);
                     start = seenStart.get(start)!;
                 }
                 while (end !== this.end) {
-                    endPath.push(end);
+                    endPath.unshift(end);
                     end = seenEnd.get(end)!;
                 }
-                await this.drawPath(startPath.concat(endPath));
+                await this.drawPath(endPath.concat(startPath));
                 done = true;
                 break;
             }
@@ -141,7 +141,6 @@ export class Pathfinding {
         seen.set(this.start!, '');
         while (q.length !== 0 && !done) {
             if (this.stop) {
-                console.log('yeet');
                 this.stop = false;
                 this.resetBoard();
                 break;
@@ -190,7 +189,7 @@ export class Pathfinding {
                 this.resetBoard();
                 break;
             }
-            await this.sleep(50);
+            await this.sleep(25);
             const coor = getCoordinateFromId(path[i]);
             this.items[coor.x][coor.y].classList.add(CellType.PATH);
         }

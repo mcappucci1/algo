@@ -26,7 +26,7 @@ export const PathfindingBoard = memo(function PathfindingBoardInternal({ showSta
 
     useEffect(() => {
         if (algo !== PATHFINDING.algo) {
-            if (PATHFINDING.running) dispatch(setReset(true));
+            dispatch(setReset(true));
             PATHFINDING.setAlgo(algo);
             dispatch(setStart(false));
         }
