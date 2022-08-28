@@ -9,6 +9,7 @@ export class Pathfinding {
     start: string | undefined;
     stop = false;
     running = false;
+    run = false;
     end: string | undefined;
     items: HTMLElement[][] = [[]];
     milliseconds: number = speedToMilliseconds(Speed.SLOW);
@@ -30,6 +31,7 @@ export class Pathfinding {
     }
 
     findPath() {
+        this.run = true;
         this.running = true;
         switch(this.algo as PathfindingAlgo) {
             case PathfindingAlgo.A_STAR: this.a_star(); break;
@@ -48,7 +50,7 @@ export class Pathfinding {
             if (this.stop) {
                 this.stop = false;
                 this.resetBoard();
-                return;
+                break;
             }
             await this.sleep();
             const curr = q.pop()!;
@@ -98,14 +100,14 @@ export class Pathfinding {
                 const [startPath, endPath]: [string[], string[]] = [[], []];
                 let [start, end] = seenEnd.has(currStart) ? [currStart, seenEnd.get(currStart)!] : [seenStart.get(currEnd)!, currEnd];
                 while (start !== this.start) {
-                    startPath.unshift(start);
+                    startPath.push(start);
                     start = seenStart.get(start)!;
                 }
                 while (end !== this.end) {
-                    endPath.push(end);
+                    endPath.unshift(end);
                     end = seenEnd.get(end)!;
                 }
-                await this.drawPath(startPath.concat(endPath));
+                await this.drawPath(endPath.concat(startPath));
                 done = true;
                 break;
             }
@@ -143,7 +145,7 @@ export class Pathfinding {
             if (this.stop) {
                 this.stop = false;
                 this.resetBoard();
-                return;
+                break;
             }
             await this.sleep();
             const coorStr = get(q), coor = getCoordinateFromId(coorStr);
@@ -168,16 +170,15 @@ export class Pathfinding {
                 }
             }
         }
+        this.running = false;
     }
 
     async breadthFirstSearch() {
         await this.firstSearch((arr: string[]) => arr.shift()!);
-        this.running = false;
     }
 
     async depthFirstSearch() {
         await this.firstSearch((arr: string[]) => arr.pop()!);
-        this.running = false;
     }
 
     async sleep(time?: number) {
@@ -190,7 +191,7 @@ export class Pathfinding {
                 this.resetBoard();
                 break;
             }
-            await this.sleep(50);
+            await this.sleep(25);
             const coor = getCoordinateFromId(path[i]);
             this.items[coor.x][coor.y].classList.add(CellType.PATH);
         }
@@ -235,6 +236,7 @@ export class Pathfinding {
                 classes.forEach(c => { if (cell.contains(c)) cell.remove(c); });
             }
         }
+        this.run = false;
     }
 
     stopExecution() {
