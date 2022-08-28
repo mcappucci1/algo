@@ -1,21 +1,20 @@
 import { memo, useCallback, useEffect, useState } from 'react';
-import { Algo, Speed } from '../utils/types';
+import { useDispatch, useSelector } from 'react-redux';
+import { setStart, setReset, selectStart, selectReset } from '../redux/controlSlice';
+import { selectSpeed, selectAlgo } from '../redux/algorithmSlice';
 import { shuffleArray, NUM_ITEMS } from '../utils/common';
 import { Sort } from '../utils/Sort';
 import '../css/SortBoard.css';
 
-interface Props {
-    speed: Speed;
-    algo: Algo;
-    start: boolean;
-    setStart: (start: boolean) => void;
-    reset: boolean;
-    setReset: (reset: boolean) => void;
-}
-
 const SORT = new Sort();
 
-export const SortBoard = memo(function SortBoardInternal({ speed, algo, start, reset, setStart, setReset }: Props) {
+export const SortBoard = memo(function SortBoardInternal() {
+    const dispatch = useDispatch();
+    const start = useSelector(selectStart);
+    const reset = useSelector(selectReset);
+    const algo = useSelector(selectAlgo);
+    const speed = useSelector(selectSpeed);
+
     const createRandomItems = useCallback(() => {
         const [heights, step]: [number[], number] = [[], 100 / NUM_ITEMS];
         for (let i = 0; i < NUM_ITEMS; ++i) heights.push(step * i + step);
@@ -27,8 +26,8 @@ export const SortBoard = memo(function SortBoardInternal({ speed, algo, start, r
 
     const resetBoard = useCallback(() => {
         if (SORT.timerId != null) setItems(createRandomItems());
-        setStart(false);
-    }, [])
+        dispatch(setStart(false));
+    }, [setItems, dispatch, setStart, createRandomItems]);
 
     useEffect(() => {
         if (algo !== SORT.algo) {
@@ -50,9 +49,9 @@ export const SortBoard = memo(function SortBoardInternal({ speed, algo, start, r
             SORT.clear();
             SORT.resetAppearance();
             setItems(createRandomItems());
-            setReset(false);
+            dispatch(setReset(false));
         }
-    }, [start, reset]);
+    }, [start, reset, setReset, dispatch, createRandomItems]);
 
     useEffect(() => {
         SORT.setAll(algo, speed, items.length);

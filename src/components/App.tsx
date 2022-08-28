@@ -1,4 +1,6 @@
 import { Fragment, memo, useState } from 'react';
+import { store } from '../redux/store';
+import { Provider } from 'react-redux';
 import { AlgoNavbar } from './AlgoNavbar';
 import { AlgoPage } from './AlgoPage';
 import { Algo, PathfindingAlgo, SortAlgo, Speed } from '../utils/types';
@@ -14,15 +16,8 @@ export const App = memo(function AppInternal() {
     const [showSetTarget, setShowSetTarget] = useState<boolean>(false);
 
     return (
-        <Fragment>
-            <AlgoNavbar
-                activeAlgo={algo}
-                setAlgo={setAlgo}
-                activeSpeed={speed}
-                setSpeed={setSpeed}
-                setStart={setStart}
-                setReset={setReset}
-            />
+        <Provider store={store}>
+            <AlgoNavbar />
             <ToastContainer className="p-3" position='top-center'>
                 <Toast
                     show={Object.values(PathfindingAlgo).includes(algo as PathfindingAlgo) && (showSetStart || showSetTarget)}
@@ -39,15 +34,9 @@ export const App = memo(function AppInternal() {
                 </Toast>
             </ToastContainer>
             <AlgoPage
-                algo={algo}
-                speed={speed}
-                start={start}
-                reset={reset}
-                setStart={setStart}
-                setReset={setReset}
-                setShowSetStartToast={setShowSetStart}
-                setShowSetTargetToast={setShowSetTarget}
+                showStartError={setShowSetStart}
+                showTargetError={setShowSetTarget}
             />
-        </Fragment>
+        </Provider>
     );
 });
