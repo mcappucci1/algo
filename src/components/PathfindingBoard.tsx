@@ -1,4 +1,4 @@
-import { memo, useCallback, useState, useEffect, ChangeEvent } from 'react';
+import { memo, useCallback, useEffect } from 'react';
 import { Grid } from './Grid';
 import { Speed, Algo, PathfindingAlgo } from '../utils/types';
 import { Pathfinding } from '../utils/Pathfinding';
@@ -12,6 +12,8 @@ interface Props {
     setStart: (start: boolean) => void;
     reset: boolean;
     setReset: (reset: boolean) => void;
+    setShowSetStartToast: (show: boolean) => void;
+    setShowSetTargetToast: (show: boolean) => void;
 }
 
 const PATHFINDING = new Pathfinding();
@@ -22,9 +24,11 @@ export const PathfindingBoard = memo(function PathfindingBoardInternal({
     start,
     setStart,
     reset,
-    setReset
+    setReset,
+    setShowSetStartToast,
+    setShowSetTargetToast
 }: Props) {
-    const [alpha, setAlpha] = useState<number>(0);
+    console.log(PATHFINDING.alpha);
 
     useEffect(() => {
         if (algo !== PATHFINDING.algo) {
@@ -45,7 +49,10 @@ export const PathfindingBoard = memo(function PathfindingBoardInternal({
 
     useEffect(() => {
         if (start) {
-            if (!PATHFINDING.running) PATHFINDING.findPath();
+            PATHFINDING.getStartandEnd();
+            if (PATHFINDING.start == undefined) setShowSetStartToast(true);
+            else if (PATHFINDING.end == undefined) setShowSetTargetToast(true);
+            else if (!PATHFINDING.running) PATHFINDING.findPath();
             setStart(false);
         } else if (reset) {
             PATHFINDING.stopExecution();
@@ -58,13 +65,13 @@ export const PathfindingBoard = memo(function PathfindingBoardInternal({
     }, []);
 
     const handleAlphaChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        PATHFINDING.alpha = parseInt(event.currentTarget.value);
+        PATHFINDING.alpha = parseFloat(event.currentTarget.value);
     }, []);
 
     return (
         <div className='w-100'>
             <Grid reset={reset} />
-            {PATHFINDING.algo === PathfindingAlgo.A_STAR &&
+            {algo === PathfindingAlgo.A_STAR &&
             <div id='alpha-container' className='w-100 mt-3'>
                 <label className='me-3'>Alpha Value</label>
                 <input type='number' id='alpha' name='alpha' onChange={handleAlphaChange} />

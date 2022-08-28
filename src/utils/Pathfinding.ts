@@ -6,17 +6,18 @@ const MOVES = [[1,0], [0,1], [-1,0], [0,-1]];
 export class Pathfinding {
     algo: Algo = PathfindingAlgo.A_STAR;
     speed: Speed = Speed.SLOW;
-    start: string = '';
+    start: string | undefined;
     stop = false;
     running = false;
-    end: string = '';
+    end: string | undefined;
     items: HTMLElement[][] = [[]];
     milliseconds: number = speedToMilliseconds(Speed.SLOW);
     timerId: NodeJS.Timer | undefined;
     alpha = 1;
 
-    findPath() {
-        this.running = true;
+    getStartandEnd() {
+        this.start = undefined;
+        this.end = undefined;
         for(let i = 0; i < NUM_ROWS; ++i) {
             for (let j = 0; j < NUM_COLS; ++j) {
                 if (this.items[i][j].classList.contains(CellType.START)) {
@@ -26,18 +27,23 @@ export class Pathfinding {
                 }
             }
         }
+    }
+
+    findPath() {
+        this.running = true;
         switch(this.algo as PathfindingAlgo) {
             case PathfindingAlgo.A_STAR: this.a_star(); break;
             case PathfindingAlgo.BREADTH_FIRST_SEARCH: this.breadthFirstSearch(); break;
             case PathfindingAlgo.DEPTH_FIRST_SEARCH: this.depthFirstSearch(); break;
+            case PathfindingAlgo.BIDIRECTIONAL_SEARCH: this.bidirectionalSearch(); break;
             default: break;
         }
     }
 
     async a_star() {
-        const seen = new Map<string, string>(), q = new PriorityQueue([[this.start, 0, 0]]), startCoor = getCoordinateFromId(this.start), endCoor = getCoordinateFromId(this.end);
+        const seen = new Map<string, string>(), q = new PriorityQueue([[this.start!, 0, 0]]), endCoor = getCoordinateFromId(this.end!);
         let done = false;
-        seen.set(this.start, '');
+        seen.set(this.start!, '');
         while (q.length !== 0 && !done) {
             if (this.stop) {
                 this.stop = false;
@@ -58,7 +64,7 @@ export class Pathfinding {
                             path.push(coorStr);
                             coorStr = seen.get(coorStr)!;
                         }
-                        this.drawPath(path);
+                        await this.drawPath(path);
                         done = true;
                         break;
                     } else {
@@ -73,10 +79,66 @@ export class Pathfinding {
         this.running = false;
     }
 
-    async firstSearch(get: (arr: string[]) => string) {
-        const seen = new Map<string, string>(), q = [this.start];
+    async bidirectionalSearch() {
+        const [seenStart, qStart] = [new Map<string, string>([[this.start!, '']]), [this.start!]];
+        const [seenEnd, qEnd] = [new Map<string, string>([[this.end!, '']]), [this.end!]];
         let done = false;
-        seen.set(this.start, '');
+        while ((qStart.length !== 0 || qEnd.length !== 0) && !done) {
+            if (this.stop) {
+                this.stop = false;
+                this.resetBoard();
+                return;
+            }
+            await this.sleep();
+            const [currStart, currEnd] = [qStart.shift()!, qEnd.shift()!];
+            const [coorStart, coorEnd] = [getCoordinateFromId(currStart), getCoordinateFromId(currEnd)];
+            if (currStart !== this.start) this.items[coorStart.x][coorStart.y].classList.add(CellType.SEARCH_1);
+            if (currEnd !== this.end) this.items[coorEnd.x][coorEnd.y].classList.add(CellType.SEARCH_2);
+            if (seenEnd.has(currStart) || seenStart.has(currEnd)) {
+                const [startPath, endPath]: [string[], string[]] = [[], []];
+                let [start, end] = seenEnd.has(currStart) ? [currStart, seenEnd.get(currStart)!] : [seenStart.get(currEnd)!, currEnd];
+                while (start !== this.start) {
+                    startPath.unshift(start);
+                    start = seenStart.get(start)!;
+                }
+                while (end !== this.end) {
+                    endPath.push(end);
+                    end = seenEnd.get(end)!;
+                }
+                await this.drawPath(startPath.concat(endPath));
+                done = true;
+                break;
+            }
+            for (let i = 0; i < MOVES.length; ++i) {
+                const move = MOVES[i];
+                const [nextStart, nextEnd] = [
+                    {x: coorStart.x + move[0], y: coorStart.y + move[1]},
+                    {x: coorEnd.x + move[0], y: coorEnd.y + move[1]}
+                ];
+                const [nextStartId, nextEndId] = [getIdFromCoordinate(nextStart), getIdFromCoordinate(nextEnd)];
+                if (nextStart.x >= 0 && nextStart.x < NUM_ROWS && nextStart.y >= 0 && nextStart.y < NUM_COLS && !seenStart.has(nextStartId)) {
+                    if (this.items[nextStart.x][nextStart.y].classList.contains(CellType.BLOCKED)) seenStart.set(nextStartId, '');
+                    else {
+                        seenStart.set(nextStartId, currStart);
+                        qStart.push(nextStartId);
+                    }
+                }
+                if (nextEnd.x >= 0 && nextEnd.x < NUM_ROWS && nextEnd.y >= 0 && nextEnd.y < NUM_COLS && !seenEnd.has(nextEndId)) {
+                    if (this.items[nextEnd.x][nextEnd.y].classList.contains(CellType.BLOCKED)) seenEnd.set(nextEndId, '');
+                    else {
+                        seenEnd.set(nextEndId, currEnd);
+                        qEnd.push(nextEndId);
+                    }
+                }
+            }
+        }
+        this.running = false;
+    }
+
+    async firstSearch(get: (arr: string[]) => string) {
+        const seen = new Map<string, string>(), q = [this.start!];
+        let done = false;
+        seen.set(this.start!, '');
         while (q.length !== 0 && !done) {
             if (this.stop) {
                 this.stop = false;
@@ -96,7 +158,7 @@ export class Pathfinding {
                             path.push(curr);
                             curr = seen.get(curr)!;
                         }
-                        this.drawPath(path);
+                        await this.drawPath(path);
                         done = true;
                         break;
                     } else {
@@ -118,12 +180,14 @@ export class Pathfinding {
         this.running = false;
     }
 
-    async sleep() {
-        return new Promise(resolve => setTimeout(resolve, this.milliseconds));
+    async sleep(time?: number) {
+        return new Promise(resolve => setTimeout(resolve, time || this.milliseconds));
     }
 
-    drawPath(path: string[]) {
+    async drawPath(path: string[]) {
         for (let i = path.length - 1; i >= 0; --i) {
+            if (this.stop) break;
+            await this.sleep(50);
             const coor = getCoordinateFromId(path[i]);
             this.items[coor.x][coor.y].classList.add(CellType.PATH);
         }

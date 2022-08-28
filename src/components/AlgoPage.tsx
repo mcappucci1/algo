@@ -11,9 +11,20 @@ interface Props {
     setStart: (start: boolean) => void;
     reset: boolean;
     setReset: (reset: boolean) => void;
+    setShowSetStartToast: (show: boolean) => void;
+    setShowSetTargetToast: (show: boolean) => void;
 }
 
-export const AlgoPage = memo(function AlgoPageInteral({ algo, speed, start, reset, setStart, setReset }: Props) {
+export const AlgoPage = memo(function AlgoPageInteral({
+    algo,
+    speed,
+    start,
+    reset,
+    setStart,
+    setReset,
+    setShowSetStartToast,
+    setShowSetTargetToast
+}: Props) {
     const speedColor = useMemo(() => {
         switch(speed) {
             case Speed.SLOW: return 'text-success';
@@ -29,8 +40,26 @@ export const AlgoPage = memo(function AlgoPageInteral({ algo, speed, start, rese
             <h5>Speed: <span className={speedColor}>{speed}</span></h5>
             <div className='board-container mx-auto mt-4 d-flex'>
                 {Object.values(SortAlgo).includes(algo as SortAlgo) ? 
-                <SortBoard speed={speed} algo={algo} start={start} reset={reset} setStart={setStart} setReset={setReset} /> :
-                <PathfindingBoard speed={speed} algo={algo} start={start} reset={reset} setStart={setStart} setReset={setReset} />}
+                    <SortBoard
+                        speed={speed}
+                        algo={algo}
+                        start={start}
+                        reset={reset}
+                        setStart={setStart}
+                        setReset={setReset}
+                    />
+                :
+                    <PathfindingBoard
+                        setShowSetStartToast={setShowSetStartToast}
+                        setShowSetTargetToast={setShowSetTargetToast}
+                        speed={speed}
+                        algo={algo}
+                        start={start}
+                        reset={reset}
+                        setStart={setStart}
+                        setReset={setReset}
+                    />
+                }
             </div>
         </div>
     );    
