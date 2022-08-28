@@ -1,67 +1,59 @@
 import { memo, useCallback, useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { setStart, setReset, selectStart, selectReset } from '../redux/controlSlice';
+import { selectSpeed, selectAlgo } from '../redux/algorithmSlice';
 import { Grid } from './Grid';
-import { Speed, Algo, PathfindingAlgo } from '../utils/types';
+import { PathfindingAlgo } from '../utils/types';
 import { Pathfinding } from '../utils/Pathfinding';
 import '../css/PathfindingBoard.css';
 import '../css/Grid.css';
 
 interface Props {
-    speed: Speed;
-    algo: Algo;
-    start: boolean;
-    setStart: (start: boolean) => void;
-    reset: boolean;
-    setReset: (reset: boolean) => void;
-    setShowSetStartToast: (show: boolean) => void;
-    setShowSetTargetToast: (show: boolean) => void;
+    showStartError: (show: boolean) => void;
+    showTargetError: (show: boolean) => void;
 }
 
 const PATHFINDING = new Pathfinding();
 
-export const PathfindingBoard = memo(function PathfindingBoardInternal({
-    speed,
-    algo,
-    start,
-    setStart,
-    reset,
-    setReset,
-    setShowSetStartToast,
-    setShowSetTargetToast
-}: Props) {
+export const PathfindingBoard = memo(function PathfindingBoardInternal({ showStartError, showTargetError}: Props) {
+    const dispatch = useDispatch();
+    const start = useSelector(selectStart);
+    const reset = useSelector(selectReset);
+    const algo = useSelector(selectAlgo);
+    const speed = useSelector(selectSpeed);
+
     const [alpha, setAlpha] = useState<number>(0.5);
 
     useEffect(() => {
         if (algo !== PATHFINDING.algo) {
-            if (PATHFINDING.running) {
-                setReset(true);
-            }
+            if (PATHFINDING.running) dispatch(setReset(true));
             PATHFINDING.setAlgo(algo);
-            setStart(false);
+            dispatch(setStart(false));
         }
-    }, [algo]);
+    }, [algo, dispatch]);
 
     useEffect(() => {
         if (speed !== PATHFINDING.speed) {
             PATHFINDING.setSpeed(speed);
-            setStart(false);
+            dispatch(setStart(false));
         }
-    }, [speed]);
+    }, [speed, dispatch]);
 
     useEffect(() => {
         if (start) {
             PATHFINDING.getStartandEnd();
-            if (PATHFINDING.start == undefined) setShowSetStartToast(true);
-            else if (PATHFINDING.end == undefined) setShowSetTargetToast(true);
+            if (PATHFINDING.start == undefined) showStartError(true);
+            else if (PATHFINDING.end == undefined) showTargetError(true);
             else if (!PATHFINDING.running) {
                 PATHFINDING.alpha = alpha;
                 PATHFINDING.findPath();
             }
-            setStart(false);
+            dispatch(setStart(false));
         } else if (reset) {
             PATHFINDING.stopExecution();
-            setReset(false);
+            dispatch(setReset(false));
         }
-    }, [start, reset]);
+    }, [start, reset, dispatch]);
 
     useEffect(() => {
         PATHFINDING.setAll(algo, speed);
