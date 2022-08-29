@@ -1,6 +1,5 @@
 import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { selectStart, selectReset } from '../redux/controlSlice';
 import { selectSpeed, selectAlgo } from '../redux/algorithmSlice';
 import { Speed, SortAlgo } from '../utils/types';
 import { SortBoard } from './SortBoard';
@@ -13,8 +12,6 @@ interface Props {
 }
 
 export const AlgoPage = memo(function AlgoPageInteral({ showStartError, showTargetError }: Props) {
-    const start = useSelector(selectStart);
-    const reset = useSelector(selectReset);
     const algo = useSelector(selectAlgo);
     const speed = useSelector(selectSpeed);
 

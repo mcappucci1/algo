@@ -1,17 +1,12 @@
-import { Fragment, memo, useState } from 'react';
+import { memo, useState } from 'react';
 import { store } from '../redux/store';
 import { Provider } from 'react-redux';
 import { AlgoNavbar } from './AlgoNavbar';
 import { AlgoPage } from './AlgoPage';
-import { Algo, PathfindingAlgo, SortAlgo, Speed } from '../utils/types';
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
 
 export const App = memo(function AppInternal() {
-    const [algo, setAlgo] = useState<Algo>(SortAlgo.BUBBLE_SORT);
-    const [speed, setSpeed] = useState<Speed>(Speed.SLOW);
-    const [start, setStart] = useState<boolean>(false);
-    const [reset, setReset] = useState<boolean>(false);
     const [showSetStart, setShowSetStart] = useState<boolean>(false);
     const [showSetTarget, setShowSetTarget] = useState<boolean>(false);
 
@@ -20,7 +15,7 @@ export const App = memo(function AppInternal() {
             <AlgoNavbar />
             <ToastContainer className="p-3" position='top-center'>
                 <Toast
-                    show={Object.values(PathfindingAlgo).includes(algo as PathfindingAlgo) && (showSetStart || showSetTarget)}
+                    show={(showSetStart || showSetTarget)}
                     delay={5000}
                     autohide
                     onClose={() => { setShowSetStart(false); setShowSetTarget(false); }}

@@ -53,7 +53,7 @@ export const PathfindingBoard = memo(function PathfindingBoardInternal({ showSta
             PATHFINDING.stopExecution();
             dispatch(setReset(false));
         }
-    }, [start, reset, dispatch]);
+    }, [start, reset, dispatch, alpha, showStartError, showTargetError]);
 
     useEffect(() => {
         PATHFINDING.setAll(algo, speed);
@@ -68,7 +68,7 @@ export const PathfindingBoard = memo(function PathfindingBoardInternal({ showSta
             <Grid reset={reset} />
             {algo === PathfindingAlgo.A_STAR &&
             <div id='alpha-container' className='w-100 mt-3'>
-                <label className='me-3'>Alpha Value</label>
+                <label className='me-3'>Heuristic Multiplier</label>
                 <input type='number' id='alpha' name='alpha' onChange={handleAlphaChange} value={alpha} />
             </div>
             }
