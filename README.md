@@ -6,3 +6,6 @@
   3) Run `npm install`
   4) Run `npm start`
   5) Open a browser and go to `http://localhost:3000/`
+
+## Using the search algorithm visualizer
+The search visualizer requires both a start and target point to be set. To set the start point, right click on a cell once (it will turn green). To set the target point, right click on a cell twice (it will turn black). Left clicking on a cell makes the cell an obstruction. To reset a cell, continue clicking right or left until the cell turns white.
