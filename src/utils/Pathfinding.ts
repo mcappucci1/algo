@@ -31,6 +31,7 @@ export class Pathfinding {
     }
 
     findPath() {
+        if (this.running) return;
         this.run = true;
         this.running = true;
         switch(this.algo as PathfindingAlgo) {

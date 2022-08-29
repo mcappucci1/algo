@@ -30,12 +30,12 @@ export const AlgoNavbar = memo(function AlgoNavbarInternal() {
     const handleStart = useCallback(() => {
         if (!start) dispatch(setStart(true));
         if (reset)  dispatch(setReset(false));
-    }, [start, reset, setStart, setReset]);
+    }, [start, reset, dispatch]);
 
     const handleReset = useCallback(() => {
         if (start)  dispatch(setStart(false));
         if (!reset) dispatch(setReset(true));
-    }, [start, reset, setStart, setReset, dispatch]);
+    }, [start, reset, dispatch]);
 
     return (
         <Navbar bg='dark' variant='dark'>

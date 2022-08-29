@@ -60,7 +60,7 @@ export const Grid = memo(function GridInternal({ reset }: Props) {
             }
         }
         return boardCells.map((row, index) => <div key={index} className="cell-row" style={{ height }} >{row}</div>);
-    }, [start, target]);
+    }, [handleLeftClick, handleRightClick]);
 
     return (
         <Fragment>

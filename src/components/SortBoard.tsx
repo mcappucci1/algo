@@ -25,37 +25,38 @@ export const SortBoard = memo(function SortBoardInternal() {
     const [items, setItems] = useState<JSX.Element[]>(createRandomItems());
 
     const resetBoard = useCallback(() => {
-        if (SORT.timerId != null) setItems(createRandomItems());
+        setItems(createRandomItems());
         dispatch(setStart(false));
-    }, [setItems, dispatch, setStart, createRandomItems]);
+    }, [dispatch, createRandomItems]);
 
     useEffect(() => {
         if (algo !== SORT.algo) {
+            if (SORT.running) SORT.stop = true;
+            if (SORT.run) {
+                SORT.resetAppearance();
+                resetBoard();
+            }
             SORT.setAlgo(algo);
-            resetBoard();
         }
     }, [algo, resetBoard]);
 
     useEffect(() => {
-        if (speed !== SORT.speed) {
-            SORT.setSpeed(speed);
-            resetBoard();
-        }
-    }, [speed, resetBoard]);
+        if (speed !== SORT.speed) SORT.setSpeed(speed);
+    }, [speed]);
 
     useEffect(() => {
-        if (start) SORT.sort();
-        else if (reset) {
-            SORT.clear();
-            SORT.resetAppearance();
-            setItems(createRandomItems());
+        if (start) {
+            SORT.sort();
+            dispatch(setStart(false));
+        } else if (reset) {
+            SORT.stopExecution();
+            resetBoard();
             dispatch(setReset(false));
         }
-    }, [start, reset, setReset, dispatch, createRandomItems]);
+    }, [start, reset, resetBoard, dispatch]);
 
     useEffect(() => {
         SORT.setAll(algo, speed, items.length);
-        return SORT.clear();
     }, []);
 
     return (
